@@ -54,8 +54,3 @@ docker-compose/*.log
 docker-compose/tmp/
 docker-compose/cache/
 
-docker-compose/*
-!docker-compose/mysql/
-!docker-compose/mysql/**
-!docker-compose/nginx/
-!docker-compose/nginx/**
