@@ -21,7 +21,7 @@ return new class extends Migration
             $table->longText('shipping');
             $table->longText('guarantee');
             $table->smallInteger('rate')->default(0);
-            $table->decimal('price', 5, 2)->default(0);
+            $table->decimal('price', 8, 2)->default(0);
             $table->string('vendor_code','14')->unique();
             $table->timestamps();
         });
