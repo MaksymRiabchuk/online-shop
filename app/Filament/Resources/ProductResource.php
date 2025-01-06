@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -32,7 +33,7 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('')->collapsible()->schema([
+                Forms\Components\Section::make('Main info')->collapsible()->schema([
                     TextInput::make('name')
                         ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                             if (!$get('is_slug_changed_manually') && filled($state)) {
@@ -44,7 +45,7 @@ class ProductResource extends Resource
                     TextInput::make('slug')
                         ->afterStateUpdated(function (Set $set) {
                             $set('is_slug_changed_manually', true);
-                        })
+                        })->unique(ignoreRecord: true)
                         ->required(),
                     Hidden::make('is_slug_changed_manually')
                         ->default(false)
@@ -53,7 +54,7 @@ class ProductResource extends Resource
                         ->preload()->searchable()->required()->label('Category'),
                     Forms\Components\Select::make('brand_id')->relationship('brand', 'name')
                         ->preload()->searchable()->required()->label('Brand'),
-                    Forms\Components\TextInput::make('vendor_code')->required()->label('Vendor code')->rules([
+                    Forms\Components\TextInput::make('vendor_code')->unique(ignoreRecord:true)->required()->label('Vendor code')->rules([
                         fn(): Closure => function (string $attribute, $value, Closure $fail) {
                             if (strlen($value) !== 14) {
                                 $fail('The :attribute is must be 14 characters long.');
@@ -64,23 +65,36 @@ class ProductResource extends Resource
                     Forms\Components\RichEditor::make('description')->required()->label('Description')->columnSpan(2),
                     Forms\Components\RichEditor::make('shipping')->required()->label('Shipping description')->columnSpan(2),
                     Forms\Components\RichEditor::make('guarantee')->required()->label('Guarantee description')->columnSpan(2),
+                ])->columns(2),
+                Forms\Components\Section::make('Images for product')->collapsible()->schema([
                     Repeater::make('Images')
                         ->relationship('images')
+                        ->reorderable()
+                        ->required()
+                        ->grid(2)
                         ->schema([
-                            FileUpload::make('image')->required()
-                                ->directory('/products')->imageEditor()->label('Image')->columnSpan(1),
-                            TextInput::make('order')
-                                ->numeric()
+                            FileUpload::make('image')
                                 ->required()
-                                ->label('Position')
-                                ->default(0),
+                                ->directory('/products')
+                                ->imageEditor()
+                                ->label('Image')
+                                ->columnSpan(1),
+                            Forms\Components\Group::make()->schema([
+                                Forms\Components\Toggle::make('is_main')
+                                    ->label('Main')
+                            ]),
                         ])
-                        ->afterStateHydrated(function (Repeater $component, $state) {
-                            foreach ($state as $index => &$item) {
-                                $item['order'] = (int)$index + 1;
-                            }
-                        })
-                ])->columns(2),
+                        ->orderColumn('order'),
+                ])->columns(1),
+                Forms\Components\Section::make('Features for product')->collapsible()->schema([
+                    Repeater::make('Features')
+                        ->required()
+                        ->grid(3)
+                        ->relationship('features')
+                        ->schema([
+                            TextInput::make('name')->required(),
+                        ])
+                ])->columns(1),
             ])->columns(1);
     }
 
@@ -99,52 +113,52 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('guarantee')->label('Guarantee description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('rate')->label('Rate')->searchable()->sortable(),
             ])
-            ->filters([
-                Filter::make('category_id')
-                    ->form([
-                        Forms\Components\Select::make('category_id')
-                            ->label('Категорія')
-                            ->options(function () {
-                                return Category::query()
-                                    ->whereNotNull('name')
-                                    ->select('name', 'id')
-                                    ->distinct()
-                                    ->orderBy('name', 'asc')
-                                    ->pluck('name', 'id')
-                                    ->toArray();
-                            })
-                            ->searchable()
-                            ->placeholder('Choose category')
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['category_id'],
-                            fn($query, $np) => $query->where('category_id', $np)
-                        );
-                    }),
-                Filter::make('brand_id')
-                    ->form([
-                        Forms\Components\Select::make('brand_id')
-                            ->label('Brand')
-                            ->options(function () {
-                                return Brand::query()
-                                    ->whereNotNull('name')
-                                    ->select('name', 'id')
-                                    ->distinct()
-                                    ->orderBy('name', 'asc')
-                                    ->pluck('name', 'id')
-                                    ->toArray();
-                            })
-                            ->searchable()
-                            ->placeholder('Choose brand')
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['brand_id'],
-                            fn($query, $np) => $query->where('brand_id', $np)
-                        );
-                    }),
-            ])
+//            ->filters([
+//                Filter::make('category_id')
+//                    ->form([
+//                        Forms\Components\Select::make('category_id')
+//                            ->label('Категорія')
+//                            ->options(function () {
+//                                return Category::query()
+//                                    ->whereNotNull('name')
+//                                    ->select('name', 'id')
+//                                    ->distinct()
+//                                    ->orderBy('name', 'asc')
+//                                    ->pluck('name', 'id')
+//                                    ->toArray();
+//                            })
+//                            ->searchable()
+//                            ->placeholder('Choose category')
+//                    ])
+//                    ->query(function (Builder $query, array $data): Builder {
+//                        return $query->when(
+//                            $data['category_id'],
+//                            fn($query, $np) => $query->where('category_id', $np)
+//                        );
+//                    }),
+//                Filter::make('brand_id')
+//                    ->form([
+//                        Forms\Components\Select::make('brand_id')
+//                            ->label('Brand')
+//                            ->options(function () {
+//                                return Brand::query()
+//                                    ->whereNotNull('name')
+//                                    ->select('name', 'id')
+//                                    ->distinct()
+//                                    ->orderBy('name', 'asc')
+//                                    ->pluck('name', 'id')
+//                                    ->toArray();
+//                            })
+//                            ->searchable()
+//                            ->placeholder('Choose brand')
+//                    ])
+//                    ->query(function (Builder $query, array $data): Builder {
+//                        return $query->when(
+//                            $data['brand_id'],
+//                            fn($query, $np) => $query->where('brand_id', $np)
+//                        );
+//                    }),
+//            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -158,6 +172,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
+            ImagesRelationManager::class,
         ];
     }
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\ProductResource\Pages;
+namespace App\Filament\Resources\ProductReviewResource\Pages;
 
-use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\ProductReviewResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditProduct extends EditRecord
+class EditProductReview extends EditRecord
 {
-    protected static string $resource = ProductResource::class;
+    protected static string $resource = ProductReviewResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -16,7 +16,6 @@ class EditProduct extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

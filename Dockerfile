@@ -1,30 +1,84 @@
-FROM php:8.2-fpm
+# Image Setup
 
-ARG user=defaultuser
-ARG uid=1000
+FROM php:8.3-fpm
 
-RUN apt update && apt install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev 
+# Set Environment Variables
 
-RUN apt clean && rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND noninteractive
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl
+# Software’s Installation
+
+# Installing tools and PHP extentions using “apt”, “docker-php”, “pecl”,
+
+# Install “curl”, “libmemcached-dev”, “libpq-dev”, “libjpeg-dev”,
+
+# “libpng-dev”, “libfreetype6-dev”, “libssl-dev”, “libmcrypt-dev”,
+
+RUN set -eux; \
+apt-get update; \
+apt-get upgrade -y; \
+apt-get install -y --no-install-recommends \
+curl \
+libmemcached-dev \
+libz-dev \
+libpq-dev \
+libjpeg-dev \
+libpng-dev \
+libfreetype6-dev \
+libssl-dev \
+libwebp-dev \
+libxpm-dev \
+libmcrypt-dev \
+libonig-dev \
+git \
+curl \
+zip \
+zlib1g-dev \
+libicu-dev \
+g++ \
+unzip; \
+rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+# Install the PHP pdo_mysql extention
+
+docker-php-ext-install pdo_mysql; \
+# Install the PHP pdo_pgsql extention
+
+docker-php-ext-install pdo_pgsql; \
+# Install the PHP gd library
+
+docker-php-ext-configure gd \
+--prefix=/usr \
+--with-jpeg \
+--with-webp \
+--with-xpm \
+--with-freetype; \
+docker-php-ext-install gd;
+
+RUN docker-php-ext-configure intl
+
+RUN docker-php-ext-install intl
+
+# Get latest Composer
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN echo "Creating user $user with UID $uid" && \
-    useradd -G www-data,root -u $uid -d /home/$user $user && \
-    mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+# Create system user to run Composer and Artisan Commands change mmenchu for your username
+
+RUN useradd -G www-data,root -u 1000 -d /home/mmenchu mmenchu
+
+RUN mkdir -p /home/mmenchu/.composer && \
+chown -R mmenchu:mmenchu /home/mmenchu
 
 WORKDIR /var/www
 
-RUN chown -R $user:$user /var/www
+COPY composer.json composer.lock ./
 
-USER $user
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-req=ext-zip
 
+COPY . .
+
+RUN chown -R 1000:1000 /var/www
