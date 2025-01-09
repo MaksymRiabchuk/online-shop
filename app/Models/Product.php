@@ -20,6 +20,73 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $category_name Name of the category of the product
  * @property string $brand_name Name of the brand of the product
  */
+
+/**
+ * @OA\Schema(
+ *     schema="Product",
+ *     type="object",
+ *     title="Product",
+ *     description="Product model",
+ *     properties={
+ *         @OA\Property(
+ *             property="id",
+ *             type="integer",
+ *             description="ID of the product"
+ *         ),
+ *         @OA\Property(
+ *             property="name",
+ *             type="string",
+ *             description="Name of the product"
+ *         ),
+ *         @OA\Property(
+ *              property="slug",
+ *              type="string",
+ *              description="Slug of the product"
+ *         ),
+ *         @OA\Property(
+ *               property="category_id",
+ *               type="integer",
+ *               description="Category of the product"
+ *          ),
+ *         @OA\Property(
+ *               property="vendor_code",
+ *               type="string",
+ *               description="Vendor code of the product"
+ *          ),
+ *         @OA\Property(
+ *               property="description",
+ *               type="string",
+ *               description="Description of the product"
+ *          ),
+ *         @OA\Property(
+ *                property="shipping",
+ *                type="string",
+ *                description="Shipping description of the product"
+ *           ),
+ *         @OA\Property(
+ *                property="guarantee",
+ *                type="string",
+ *                description="Guarentee description of the product"
+ *         ),
+ *         @OA\Property(
+ *                property="rate",
+ *                type="integer",
+ *                description="rate of the product"
+ *         ),
+ *         @OA\Property(
+ *                property="brand_id",
+ *                type="integer",
+ *                description="Brand of the product"
+ *         ),
+ *         @OA\Property(
+ *             property="price",
+ *             type="number",
+ *             format="float",
+ *             description="Price of the product"
+ *         )
+ *     }
+ * )
+ */
 class Product extends Model
 {
 

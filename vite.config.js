@@ -6,7 +6,8 @@ import path from 'path'
 export default defineConfig({
     server: {
         hmr: {
-            host: 'localhost'
+            host: 'localhost',
+            port: 8000,
         }
     },
     plugins: [

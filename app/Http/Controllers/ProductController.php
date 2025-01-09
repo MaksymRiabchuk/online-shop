@@ -9,10 +9,47 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
+/**
+ * @OA\Info(
+ *     title="Wildpath API",
+ *     version="0.1"
+ * )
+ */
+
 class ProductController extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    /**
+     * @OA\Get(
+     *     path="/api/get-products",
+     *     summary="Get list of products",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="category_id",
+     *         in="query",
+     *         description="Category ID to filter products",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No products were found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="No products were found")
+     *         )
+     *     )
+     * )
+     */
     public function getProducts(Request $request)
     {
         $category_id = $request->get('category_id', 0);
@@ -34,6 +71,7 @@ class ProductController extends BaseController
             'message' => 'No products were found',
         ], 404);
     }
+
 
     public function getProduct(Request $request)
     {
