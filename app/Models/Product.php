@@ -128,6 +128,11 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    public function imagesByMain(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->where('is_main', 1);
+    }
+
     public function features(): HasMany
     {
         return $this->hasMany(ProductFeature::class);

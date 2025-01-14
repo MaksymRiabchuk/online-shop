@@ -74,7 +74,6 @@ class ProductResource extends Resource
                         ->grid(2)
                         ->schema([
                             FileUpload::make('image')
-                                ->required()
                                 ->directory('/products')
                                 ->imageEditor()
                                 ->label('Image')
@@ -102,6 +101,7 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('imagesByMain.image')->label('Image')->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('name')->label('Title')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('slug')->label('Slug')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('category.name')->label('Category')->searchable()->sortable(),
@@ -113,52 +113,52 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('guarantee')->label('Guarantee description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('rate')->label('Rate')->searchable()->sortable(),
             ])
-//            ->filters([
-//                Filter::make('category_id')
-//                    ->form([
-//                        Forms\Components\Select::make('category_id')
-//                            ->label('Категорія')
-//                            ->options(function () {
-//                                return Category::query()
-//                                    ->whereNotNull('name')
-//                                    ->select('name', 'id')
-//                                    ->distinct()
-//                                    ->orderBy('name', 'asc')
-//                                    ->pluck('name', 'id')
-//                                    ->toArray();
-//                            })
-//                            ->searchable()
-//                            ->placeholder('Choose category')
-//                    ])
-//                    ->query(function (Builder $query, array $data): Builder {
-//                        return $query->when(
-//                            $data['category_id'],
-//                            fn($query, $np) => $query->where('category_id', $np)
-//                        );
-//                    }),
-//                Filter::make('brand_id')
-//                    ->form([
-//                        Forms\Components\Select::make('brand_id')
-//                            ->label('Brand')
-//                            ->options(function () {
-//                                return Brand::query()
-//                                    ->whereNotNull('name')
-//                                    ->select('name', 'id')
-//                                    ->distinct()
-//                                    ->orderBy('name', 'asc')
-//                                    ->pluck('name', 'id')
-//                                    ->toArray();
-//                            })
-//                            ->searchable()
-//                            ->placeholder('Choose brand')
-//                    ])
-//                    ->query(function (Builder $query, array $data): Builder {
-//                        return $query->when(
-//                            $data['brand_id'],
-//                            fn($query, $np) => $query->where('brand_id', $np)
-//                        );
-//                    }),
-//            ])
+            ->filters([
+                Filter::make('category_id')
+                    ->form([
+                        Forms\Components\Select::make('category_id')
+                            ->label('Категорія')
+                            ->options(function () {
+                                return Category::query()
+                                    ->whereNotNull('name')
+                                    ->select('name', 'id')
+                                    ->distinct()
+                                    ->orderBy('name', 'asc')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->searchable()
+                            ->placeholder('Choose category')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['category_id'],
+                            fn($query, $np) => $query->where('category_id', $np)
+                        );
+                    }),
+                Filter::make('brand_id')
+                    ->form([
+                        Forms\Components\Select::make('brand_id')
+                            ->label('Brand')
+                            ->options(function () {
+                                return Brand::query()
+                                    ->whereNotNull('name')
+                                    ->select('name', 'id')
+                                    ->distinct()
+                                    ->orderBy('name', 'asc')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->searchable()
+                            ->placeholder('Choose brand')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['brand_id'],
+                            fn($query, $np) => $query->where('brand_id', $np)
+                        );
+                    }),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -172,7 +172,6 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ImagesRelationManager::class,
         ];
     }
 
