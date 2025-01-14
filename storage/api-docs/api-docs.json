@@ -1,0 +1,126 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Wildpath API",
+        "version": "0.1"
+    },
+    "paths": {
+        "/api/get-products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get list of products",
+                "operationId": "76285e615682d43e28fab7e87f003e72",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Category ID to filter products",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Product"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No products were found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No products were found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Product": {
+                "title": "Product",
+                "description": "Product model",
+                "properties": {
+                    "id": {
+                        "description": "ID of the product",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Name of the product",
+                        "type": "string"
+                    },
+                    "slug": {
+                        "description": "Slug of the product",
+                        "type": "string"
+                    },
+                    "category_id": {
+                        "description": "Category of the product",
+                        "type": "integer"
+                    },
+                    "vendor_code": {
+                        "description": "Vendor code of the product",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Description of the product",
+                        "type": "string"
+                    },
+                    "shipping": {
+                        "description": "Shipping description of the product",
+                        "type": "string"
+                    },
+                    "guarantee": {
+                        "description": "Guarentee description of the product",
+                        "type": "string"
+                    },
+                    "rate": {
+                        "description": "rate of the product",
+                        "type": "integer"
+                    },
+                    "brand_id": {
+                        "description": "Brand of the product",
+                        "type": "integer"
+                    },
+                    "price": {
+                        "description": "Price of the product",
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Products",
+            "description": "Products"
+        }
+    ]
+}

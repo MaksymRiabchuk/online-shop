@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string $name Title of the product
@@ -18,6 +19,73 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $brand_id Brand of the product
  * @property string $category_name Name of the category of the product
  * @property string $brand_name Name of the brand of the product
+ */
+
+/**
+ * @OA\Schema(
+ *     schema="Product",
+ *     type="object",
+ *     title="Product",
+ *     description="Product model",
+ *     properties={
+ *         @OA\Property(
+ *             property="id",
+ *             type="integer",
+ *             description="ID of the product"
+ *         ),
+ *         @OA\Property(
+ *             property="name",
+ *             type="string",
+ *             description="Name of the product"
+ *         ),
+ *         @OA\Property(
+ *              property="slug",
+ *              type="string",
+ *              description="Slug of the product"
+ *         ),
+ *         @OA\Property(
+ *               property="category_id",
+ *               type="integer",
+ *               description="Category of the product"
+ *          ),
+ *         @OA\Property(
+ *               property="vendor_code",
+ *               type="string",
+ *               description="Vendor code of the product"
+ *          ),
+ *         @OA\Property(
+ *               property="description",
+ *               type="string",
+ *               description="Description of the product"
+ *          ),
+ *         @OA\Property(
+ *                property="shipping",
+ *                type="string",
+ *                description="Shipping description of the product"
+ *           ),
+ *         @OA\Property(
+ *                property="guarantee",
+ *                type="string",
+ *                description="Guarentee description of the product"
+ *         ),
+ *         @OA\Property(
+ *                property="rate",
+ *                type="integer",
+ *                description="rate of the product"
+ *         ),
+ *         @OA\Property(
+ *                property="brand_id",
+ *                type="integer",
+ *                description="Brand of the product"
+ *         ),
+ *         @OA\Property(
+ *             property="price",
+ *             type="number",
+ *             format="float",
+ *             description="Price of the product"
+ *         )
+ *     }
+ * )
  */
 class Product extends Model
 {
@@ -53,5 +121,20 @@ class Product extends Model
     public function getBrandNameAttribute()
     {
         return $this->brand()->first()->name;
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function imagesByMain(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->where('is_main', 1);
+    }
+
+    public function features(): HasMany
+    {
+        return $this->hasMany(ProductFeature::class);
     }
 }
