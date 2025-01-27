@@ -32,46 +32,39 @@ class PropertyProductResource extends Resource
                         Forms\Components\Select::make('product_id')
                             ->relationship('product', 'name')
                             ->required(),
-
-                        // Перша властивість (наприклад, колір або розмір)
                         Forms\Components\Select::make('property_id')
                             ->label('Select Property')
                             ->options(function () {
-                                // Завантажити всі властивості (колір, розмір тощо)
+
                                 return Property::all()->pluck('name', 'id')->filter(function ($value) {
-                                    return !is_null($value); // Виключаємо null значення
+                                    return !is_null($value);
                                 });
                             })
-                            ->reactive() // робимо поле реактивним, щоб оновлювалось після вибору
+                            ->reactive()
                             ->afterStateUpdated(function ($set, $state) {
-                                // Після вибору властивості, оновлюємо наступне поле (значення залежатиме від вибору)
-                                $set('property_value_id', null); // Очищаємо попередній вибір підвластивості
+
+                                $set('property_value_id', null);
                             })
                             ->required(),
-
-                        // Підвластивість (наприклад, конкретний колір для вибраного "Колір")
                         Forms\Components\Select::make('property_value_id')
                             ->label('Select Property Value')
                             ->options(function (callable $get) {
-                                $propertyId = $get('property_id'); // Отримуємо вибрану властивість
+                                $propertyId = $get('property_id');
 
-                                // Якщо вибрано властивість
                                 if ($propertyId) {
                                     $property = Property::find($propertyId);
                                     if ($property) {
                                         return $property->propertyValues
                                             ->pluck('name', 'id')
                                             ->filter(function ($value) {
-                                                return !is_null($value); // Виключаємо null значення
+                                                return !is_null($value);
                                             });
                                     }
                                 }
-
-                                // Якщо жодна властивість не вибрана — не показуємо значень
                                 return [];
                             })
                             ->required()
-                            ->disabled(fn($get) => !$get('property_id')), // вимикаємо, поки не вибрана властивість
+                            ->disabled(fn($get) => !$get('property_id')),
                     ])
                     ->columns(3)
             ]);
