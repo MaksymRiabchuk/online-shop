@@ -55,7 +55,7 @@ class PropertyProductResource extends Resource
                                     $property = Property::find($propertyId);
                                     if ($property) {
                                         return $property->propertyValues
-                                            ->pluck('name', 'id')
+                                            ->pluck('value', 'id')
                                             ->filter(function ($value) {
                                                 return !is_null($value);
                                             });
@@ -75,10 +75,12 @@ class PropertyProductResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('product.name')->label('Product name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('property.name')->label('Property name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('propertyValue.value')->label('Property Value')->searchable()->sortable(),
             ])
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
