@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('property_products', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('product_id')->constrained('products');
             $table->foreignId('property_id')->constrained('properties');
-            $table->primary(['product_id', 'property_id']);
             $table->timestamps();
         });
     }
