@@ -43,10 +43,10 @@ class PropertyProductResource extends Resource
                             ->reactive()
                             ->afterStateUpdated(function ($set, $state) {
 
-                                $set('property_value_id', null);
+                                $set('value_id', null);
                             })
                             ->required(),
-                        Forms\Components\Select::make('property_value_id')
+                        Forms\Components\Select::make('value_id')
                             ->label('Select Property Value')
                             ->options(function (callable $get) {
                                 $propertyId = $get('property_id');
