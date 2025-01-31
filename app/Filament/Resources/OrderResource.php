@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\User;
 use Closure;
@@ -38,7 +39,6 @@ class OrderResource extends Resource
                             ->label('Select user (optional)')
                             ->reactive()
                             ->afterStateUpdated(function ($set, $state) {
-
                                 if ($state)
                                 {
                                     $user = User::find($state);
@@ -55,28 +55,56 @@ class OrderResource extends Resource
                                     $set('lastname', null);
                                     $set('phone', null);
                                 }
-                            })
-                        ->required(),
+                            }),
                         TextInput::make('name')->label('User name')->required(),
                         TextInput::make('lastname')->label('Last name')->required(),
                         TextInput::make('phone')->label('Phone')->required(),
                         TextInput::make('email')->label('Email')->required(),
                         TextInput::make('status')->label('Status')->required(),
                         TextInput::make('comment')->label('Comment')->required(),
+
                         Forms\Components\Section::make('Select product`s for order')->collapsible()
                             ->schema([
                                 Repeater::make('orderProducts')
-                                ->schema([
-                                    Select::make('product_id')
-                                        ->label('Product')
-                                        ->options(Product::all()->pluck('name', 'id'))
-                                        ->required(),
-                                    TextInput::make('quantity')
-                                        ->label('Quantity')
-                                        ->numeric()
-                                        ->default(1)
-                                        ->required(),
-                                ])
+                                    ->relationship('orderProducts')
+                                    ->schema([
+                                        Select::make('product_id')
+                                            ->label('Product')
+                                            ->options(Product::all()->pluck('name', 'id'))
+                                            ->reactive()
+                                            ->afterStateUpdated(function ($set, $state) {
+                                                $product = Product::find($state);
+
+                                                if ($product) {
+                                                    $set('quantity', 1);
+                                                    $set('cost', $product->price);
+                                                } else {
+                                                    $set('quantity', null);
+                                                    $set('cost', null);
+                                                }
+                                            })
+                                            ->required(),
+                                        TextInput::make('quantity')
+                                            ->label('Quantity')
+                                            ->reactive()
+                                            ->numeric()
+                                            ->default(1)
+                                            ->afterStateUpdated(function ($set, $get, $state) {
+                                                $productId = $get('product_id');
+
+                                                if ($productId) {
+                                                    $product = Product::find($productId);
+
+                                                    if ($product) {
+                                                        $set('cost', $product->price * $state);
+                                                    }
+                                                }
+                                            })
+                                            ->required(),
+                                        TextInput::make('cost')
+                                            ->label('Cost')
+                                            ->required(),
+                                    ])
                                     ->reorderable()
                                     ->grid(2)
                             ])
@@ -89,7 +117,10 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('id')->label('Order ID')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('email')->label('User Email')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('name')->label('User name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('status')->label('Order status')->searchable()->sortable(),
             ])
             ->filters([
                 //

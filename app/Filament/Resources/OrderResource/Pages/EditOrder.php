@@ -16,4 +16,21 @@ class EditOrder extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Оновлюємо основні дані замовлення
+        $order = $this->record; // Отримуємо поточний запис
+        $order->update(collect($data)->except(['orderProducts'])->toArray());
+
+        // Оновлюємо продукти замовлення
+        if (isset($data['orderProducts']) && is_array($data['orderProducts'])) {
+            $order->orderProducts()->delete(); // Видаляємо старі продукти
+            foreach ($data['orderProducts'] as $orderProductData) {
+                $order->orderProducts()->create($orderProductData);
+            }
+        }
+
+        return $data;
+    }
 }
