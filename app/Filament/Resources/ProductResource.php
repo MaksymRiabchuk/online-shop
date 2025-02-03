@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -54,7 +55,7 @@ class ProductResource extends Resource
                         ->preload()->searchable()->required()->label('Category'),
                     Forms\Components\Select::make('brand_id')->relationship('brand', 'name')
                         ->preload()->searchable()->required()->label('Brand'),
-                    Forms\Components\TextInput::make('vendor_code')->unique(ignoreRecord:true)->required()->label('Vendor code')->rules([
+                    Forms\Components\TextInput::make('vendor_code')->unique(ignoreRecord: true)->required()->label('Vendor code')->rules([
                         fn(): Closure => function (string $attribute, $value, Closure $fail) {
                             if (strlen($value) !== 14) {
                                 $fail('The :attribute is must be 14 characters long.');
@@ -66,6 +67,17 @@ class ProductResource extends Resource
                     Forms\Components\RichEditor::make('shipping')->required()->label('Shipping description')->columnSpan(2),
                     Forms\Components\RichEditor::make('guarantee')->required()->label('Guarantee description')->columnSpan(2),
                 ])->columns(2),
+                Forms\Components\Section::make('Discount')->collapsible()->schema([
+                    Repeater::make('Discount')
+                        ->relationship('discount')
+                        ->addable(false)
+                        ->deletable(false)
+                        ->schema([
+                            TextInput::make('percentage')->required()->numeric()->maxValue(100)->minValue(1),
+                            DateTimePicker::make('start_date')->required()->format('Y-m-d H:i:s'),
+                            DateTimePicker::make('end_date')->required()->format('Y-m-d H:i:s'),
+                        ])->columns(3),
+                ])->columns(1),
                 Forms\Components\Section::make('Images for product')->collapsible()->schema([
                     Repeater::make('Images')
                         ->relationship('images')
@@ -87,7 +99,6 @@ class ProductResource extends Resource
                 ])->columns(1),
                 Forms\Components\Section::make('Features for product')->collapsible()->schema([
                     Repeater::make('Features')
-                        ->required()
                         ->grid(3)
                         ->relationship('features')
                         ->schema([
@@ -108,9 +119,9 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('brand.name')->label('Brand')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('price')->label('Price')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('vendor_code')->label('Vendor Code')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
-                Tables\Columns\TextColumn::make('description')->label('Description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
-                Tables\Columns\TextColumn::make('shipping')->label('Shipping description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
-                Tables\Columns\TextColumn::make('guarantee')->label('Guarantee description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
+                Tables\Columns\TextColumn::make('description')->html()->label('Description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
+                Tables\Columns\TextColumn::make('shipping')->html()->label('Shipping description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
+                Tables\Columns\TextColumn::make('guarantee')->html()->label('Guarantee description')->searchable()->sortable()->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('rate')->label('Rate')->searchable()->sortable(),
             ])
             ->filters([
