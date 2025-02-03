@@ -4,13 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Enums\ProductReviewStatuses;
 use App\Filament\Resources\ProductReviewResource\Pages;
+use App\Models\Product;
 use App\Models\ProductReview;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductReviewResource extends Resource
 {
@@ -34,14 +38,6 @@ class ProductReviewResource extends Resource
                     Forms\Components\Select::make('status')->options(ProductReviewStatuses::listData())
                         ->label('Status')->columnSpan(1),
                     Forms\Components\Textarea::make('review')->label('Review')->disabled()->columnSpan(4),
-//                    Forms\Components\TextInput::make('vendor_code')->unique(ignoreRecord:true)
-//                        ->required()->label('Vendor code')->rules([
-//                        fn(): Closure => function (string $attribute, $value, Closure $fail) {
-//                            if (strlen($value) !== 14) {
-//                                $fail('The :attribute is must be 14 characters long.');
-//                            }
-//                        },
-//                    ]),
                 ])->columns(4),
             ]);
     }
@@ -55,13 +51,57 @@ class ProductReviewResource extends Resource
                     ->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('product.name')->label('Product')->searchable()
                     ->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('review')->html()->label('Review')->toggleable()->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('status')
                     ->state(function (ProductReview $record): string {
                         return $record->status ? ProductReviewStatuses::getLabel($record->status) : ' ';
                     })->label('Status')->toggleable()->sortable(),
             ])->defaultSort('updated_at','desc')
             ->filters([
-                //
+                Filter::make('user_id')
+                    ->form([
+                        Forms\Components\Select::make('user_id')
+                            ->label('User')
+                            ->options(function () {
+                                return User::query()
+                                    ->whereNotNull('name')
+                                    ->select('name', 'id')
+                                    ->distinct()
+                                    ->orderBy('name', 'asc')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->searchable()
+                            ->placeholder('Choose user')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['user_id'],
+                            fn($query, $np) => $query->where('user_id', $np)
+                        );
+                    }),
+                Filter::make('product_id')
+                    ->form([
+                        Forms\Components\Select::make('product_id')
+                            ->label('Product')
+                            ->options(function () {
+                                return Product::query()
+                                    ->whereNotNull('name')
+                                    ->select('name', 'id')
+                                    ->distinct()
+                                    ->orderBy('name', 'asc')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->searchable()
+                            ->placeholder('Choose product')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['product_id'],
+                            fn($query, $np) => $query->where('product_id', $np)
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
