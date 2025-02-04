@@ -57,6 +57,9 @@ class UserResource extends Resource
                         ->label('Email')
                         ->placeholder('Enter user email')
                         ->rules('unique:users,email'),
+                    TextInput::make('address')
+                        ->live(true)
+                        ->required(),
                     TextInput::make('password')
                         ->label('Password')
                         ->password()

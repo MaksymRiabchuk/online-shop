@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\Property;
 use App\Models\User;
 use Closure;
 use Filament\Forms;
@@ -101,6 +102,35 @@ class OrderResource extends Resource
                                                 }
                                             })
                                             ->required(),
+                                        Repeater::make('properties')
+                                        ->relationship('properties')
+                                        ->schema([
+                                            Select::make('property_id')
+                                                ->label('Select Property')
+                                                ->options(Property::all()->pluck('name', 'id'))
+                                                ->reactive()
+                                                ->required(),
+                                            Select::make('value_id')
+                                                ->label('Select Property Value')
+                                                ->options(function (callable $get) {
+                                                    $propertyId = $get('property_id');
+
+                                                    if ($propertyId) {
+                                                        $property = Property::find($propertyId);
+
+                                                        if ($property) {
+                                                            return $property->propertyValues->pluck('value', 'id');
+                                                        }
+                                                    }
+
+                                                    return [];
+                                                })
+                                                ->reactive()
+                                                    ->disabled(fn($get) => !$get('property_id')),
+                                            ])
+                                            ->minItems(1)
+                                            ->columns(2)
+                                            ->reorderable(),
                                         TextInput::make('cost')
                                             ->label('Cost')
                                             ->required(),
