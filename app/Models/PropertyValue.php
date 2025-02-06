@@ -14,4 +14,6 @@ class PropertyValue extends Model
     {
         return $this->belongsTo(Property::class);
     }
+
+    protected $fillable = ['property_id', 'value'];
 }

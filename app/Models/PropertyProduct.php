@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PropertyProduct extends Model
 {
-    protected $fillable = ['property_id', 'product_id'];
+    protected $fillable = ['property_id', 'product_id', 'value_id'];
 
     public function product()
     {
@@ -21,5 +21,10 @@ class PropertyProduct extends Model
     public function property()
     {
         return $this->belongsTo(Property::class, 'property_id');
+    }
+
+    public function propertyValue()
+    {
+        return $this->belongsTo(PropertyValue::class, 'value_id');
     }
 }

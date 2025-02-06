@@ -21,7 +21,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'lastname',
+        'phone',
         'email',
+        'address',
+        'google_id',
         'password',
     ];
 
@@ -45,8 +49,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function profile() : HasOne
+    public function order() : HasMany
     {
-        return $this->hasOne(Profile::class);
+        return $this->hasMany(Order::class);
     }
 }

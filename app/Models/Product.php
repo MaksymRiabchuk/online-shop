@@ -143,4 +143,9 @@ class Product extends Model
     {
         return $this->hasMany(ProductFeature::class);
     }
+
+    public function propertyProducts()
+    {
+        return $this->hasMany(PropertyProduct::class);
+    }
 }

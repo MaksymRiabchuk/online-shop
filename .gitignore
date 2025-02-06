@@ -38,6 +38,8 @@ auth.json
 public_html/storage
 public_html/hot
 
+composer.lock
+
 storage/*.key
 /.vagrant
 
