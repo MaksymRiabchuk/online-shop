@@ -70,12 +70,12 @@ class ProductResource extends Resource
                 Forms\Components\Section::make('Discount')->collapsible()->schema([
                     Repeater::make('Discount')
                         ->relationship('discount')
-                        ->addable(false)
-                        ->deletable(false)
+                        ->minItems(0)->maxItems(1)
+                        ->defaultItems(0)
                         ->schema([
-                            TextInput::make('percentage')->required()->numeric()->maxValue(100)->minValue(1),
-                            DateTimePicker::make('start_date')->required()->format('Y-m-d H:i:s'),
-                            DateTimePicker::make('end_date')->required()->format('Y-m-d H:i:s'),
+                            TextInput::make('percentage')->numeric()->maxValue(100)->minValue(1),
+                            DateTimePicker::make('start_date')->format('Y-m-d H:i:s'),
+                            DateTimePicker::make('end_date')->format('Y-m-d H:i:s'),
                         ])->columns(3),
                 ])->columns(1),
                 Forms\Components\Section::make('Images for product')->collapsible()->schema([
@@ -100,6 +100,7 @@ class ProductResource extends Resource
                 Forms\Components\Section::make('Features for product')->collapsible()->schema([
                     Repeater::make('Features')
                         ->grid(3)
+                        ->defaultItems(0)
                         ->relationship('features')
                         ->schema([
                             TextInput::make('name')->required(),
